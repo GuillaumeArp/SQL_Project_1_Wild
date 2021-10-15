@@ -5,7 +5,7 @@ This project was completed by a team of 4 students:
 - [Alexandra Houssin](https://github.com/alexandrahoussin) : Human Resources KPIs
 - [Elisa Tarbouriech](https://github.com/ElisaTarbouriech) : Logistics KPIs
 - [Guillaume Arp](https://github.com/GuillaumeArp) - Sales KPIs
-- Nizar Ben Slama - Finance KPIs
+- [Nizar Ben Slama](https://github.com/bennizar87) - Finance KPIs
 
 The database was created using the dump_2021sept_update_october.sql file added to the repo.
 All the queries are in the file all_sql_queries.sql.
