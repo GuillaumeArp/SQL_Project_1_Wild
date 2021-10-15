@@ -1,5 +1,4 @@
 -- RH
-CREATE VIEW KPI_HR AS(
 WITH employee_rank AS(
     SELECT
         YEAR(payments.paymentDate) AS payment_year,
@@ -48,96 +47,123 @@ WHERE
     or row_num = '2'
 ORDER BY
     1 DESC,
-    row_num);
+    row_num;;
     
-SELECT offices.country, 
-SUM(payments.amount) as turnover
-FROM offices
-JOIN employees 
-ON offices.officeCode = employees.officeCode
-JOIN customers 
-ON employees.employeeNumber = customers.salesRepEmployeeNumber
-JOIN payments
-ON customers.customerNumber = payments.customerNumber
-WHERE YEAR(payments.paymentDate) = YEAR(CURDATE())
-GROUP BY offices.country;
+SELECT
+    offices.country,
+    SUM(payments.amount) as turnover
+FROM
+    offices
+    JOIN employees ON offices.officeCode = employees.officeCode
+    JOIN customers ON employees.employeeNumber = customers.salesRepEmployeeNumber
+    JOIN payments ON customers.customerNumber = payments.customerNumber
+WHERE
+    YEAR(payments.paymentDate) = YEAR(CURDATE())
+GROUP BY
+    offices.country;
 
 
 
-SELECT offices.country, 
-COUNT(employeeNumber) as nb_employee
-FROM offices
-JOIN employees 
-ON offices.officeCode = employees.officeCode
-GROUP BY offices.country;
+SELECT
+    offices.country,
+    COUNT(employeeNumber) as nb_employee
+FROM
+    offices
+    JOIN employees ON offices.officeCode = employees.officeCode
+GROUP BY
+    offices.country;
 
 
-select employees.employeeNumber, CONCAT(lastName, ' ', firstName) as employee, 
-SUM(amount) as turnover
-FROM employees
-JOIN customers
-ON employees.employeeNumber = customers.salesRepEmployeeNumber
-JOIN payments
-on customers.customerNumber = payments.customerNumber
-WHERE YEAR(payments.paymentDate) = YEAR(CURDATE())
-GROUP BY employeeNumber
-ORDER BY turnover DESC
-LIMIT 1 ;
+SELECT
+    employees.employeeNumber,
+    CONCAT(lastName, ' ', firstName) as employee,
+    SUM(amount) as turnover
+FROM
+    employees
+    JOIN customers ON employees.employeeNumber = customers.salesRepEmployeeNumber
+    JOIN payments on customers.customerNumber = payments.customerNumber
+WHERE
+    YEAR(payments.paymentDate) = YEAR(CURDATE())
+GROUP BY
+    employeeNumber
+ORDER BY
+    turnover DESC
+LIMIT
+    1;
 
-#Logistique : 5 produits les plus commandés
+-- Logistique : 5 produits les plus commandés
 
-SELECT products.productName, SUM(orderdetails.quantityOrdered) as total
-from products
-JOIN orderdetails ON products.productCode = orderdetails.productCode
-GROUP BY products.productName
-ORDER BY total DESC
-LIMIT 5;
+SELECT
+    products.productName,
+    SUM(orderdetails.quantityOrdered) as total
+FROM
+    products
+    JOIN orderdetails ON products.productCode = orderdetails.productCode
+GROUP BY
+    products.productName
+ORDER BY
+    total DESC
+LIMIT
+    5;
 
-#Stock des 5 produits commandés
+-- Stock des 5 produits les plus commandés
 
-SELECT products.productName,quantityInstock,
-SUM(orderdetails.quantityOrdered) as totalOrdered
-from products
-JOIN orderdetails ON products.productCode = orderdetails.productCode
-GROUP BY products.productName,quantityInstock
-ORDER BY totalOrdered DESC
-LIMIT 5;
+SELECT
+    products.productName,
+    quantityInstock,
+    SUM(orderdetails.quantityOrdered) as totalOrdered
+FROM
+    products
+    JOIN orderdetails ON products.productCode = orderdetails.productCode
+GROUP BY
+    products.productName,
+    quantityInstock
+ORDER BY
+    totalOrdered DESC
+LIMIT
+    5;
     
     
  -- finance
  --Turnover of orders or last 2 months by country
 CREATE VIEW Orders_2Months AS (
+    SELECT
+        c.country Country,
+        SUM(quantityOrdered * priceEach) TurnOver
+    FROM
+        orderdetails od
+        JOIN orders o ON od.orderNumber = o.orderNumber
+        JOIN customers c ON o.customerNumber = c.customerNumber
+    WHERE
+        orderDate >= now() - interval 2 month
+    GROUP BY
+        c.country
+    ORDER BY
+        2 DESC
+);
 
-SELECT c.country Country, SUM(quantityOrdered*priceEach) TurnOver
-FROM orderdetails od
-JOIN orders o ON od.orderNumber=o.orderNumber
-JOIN customers c ON o.customerNumber=c.customerNumber
-WHERE orderDate >= now()-interval 2 month
-GROUP BY c.country
-ORDER BY 2 DESC
-
-                    );
-
-
-select od.orderDate from Orders_2Months;
+SELECT od.orderDate FROM Orders_2Months;
 
 
 --Not Paid Orders
 CREATE VIEW Unpaid_Orders AS (
+    SELECT
+        p.productLine Product,
+        SUM(d.quantityOrdered) as Quantity
+    FROM
+        orderdetails d
+        JOIN orders o ON o.orderNumber = d.orderNumber
+        JOIN products p ON p.productCode = d.productCode
+    WHERE
+        o.shippedDate IS NULL
+        AND o.status IN ('On Hold', 'Cancelled', 'Resolved')
+    GROUP BY
+        productLine
+    ORDER BY
+        Quantity
+);
 
-SELECT p.productLine Product, SUM(d.quantityOrdered) as Quantity
-FROM orderdetails d
-JOIN orders o ON o.orderNumber = d.orderNumber
-JOIN products p ON p.productCode = d.productCode
-WHERE o.shippedDate IS NULL
-AND o.status IN ('On Hold', 'Cancelled', 'Resolved')
-GROUP BY productLine
-ORDER BY Quantity
-
-                                );
-
-
-select * from Unpaid_Orders;
+SELECT * FROM Unpaid_Orders;
 
 -- SALES
 WITH tablefinale AS (
