@@ -15,3 +15,5 @@ Each KPI was then rendered in a Tableau dashboard:
 - [Logistics](https://public.tableau.com/app/profile/tarbouriech/viz/PROJET_KPI_LOGISTIC/tableaudebord?publish=yes)
 - [Sales](https://public.tableau.com/app/profile/guillaume.arp/viz/Project_1_Remote/Sales_dashboard?publish=yes)
 - [Finance](https://public.tableau.com/app/profile/nizar5526/viz/Book1_16335785799400/Dashboard1)
+
+Fin.
